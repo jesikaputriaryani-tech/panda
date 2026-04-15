@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rahasia Panda</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --matcha: #ccd5ae; --dark-leaf: #a4ac86; --panda-white: #ffffff;
+            --panda-black: #333333; --blush: #ffafcc; --sky-blue: #e0f2fe;
+            --warm-glow: rgba(255, 255, 190, 0.4); --paper: #fcfaf2;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; height: 100vh; display: flex; justify-content: center; align-items: center; background: #f0ead2; font-family: 'Fredoka', sans-serif; overflow: hidden; transition: background 1s ease; }
+        .stage { position: relative; width: 320px; height: 550px; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; }
+        #securityScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0ead2; z-index: 200; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
+        .nose-btn { width: 60px; height: 60px; background: black; border-radius: 50%; margin: 20px auto; cursor: pointer; border: 5px solid white; }
+        .panda { position: relative; width: 110px; height: 90px; background: var(--panda-white); border-radius: 50% 50% 45% 45%; transition: 1.5s; display: flex; justify-content: center; cursor: pointer; z-index: 20; transform: translateX(-200vw); }
+        .ear { position: absolute; top: -10px; width: 30px; height: 30px; background: var(--panda-black); border-radius: 50%; }
+        .ear.l { left: 0; } .ear.r { right: 0; }
+        .eye-patch { position: absolute; top: 30px; width: 30px; height: 35px; background: var(--panda-black); border-radius: 50%; }
+        .eye-patch.l { left: 15px; transform: rotate(15deg); } .eye-patch.r { right: 15px; transform: rotate(-15deg); }
+        .nose { position: absolute; top: 55px; width: 10px; height: 6px; background: #000; border-radius: 50%; }
+        .letter { position: absolute; width: 290px; min-height: 350px; background: var(--paper); padding: 20px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); text-align: center; transform: scale(0); opacity: 0; transition: 0.6s; z-index: 15; border: 8px double var(--matcha); }
+        .page { display: none; } .page.active { display: block; }
+        .next-btn { background: var(--matcha); border: none; padding: 10px 20px; border-radius: 12px; color: white; cursor: pointer; margin-top: 10px; }
+        .start-btn { padding: 15px 30px; background: var(--dark-leaf); color: white; border: none; border-radius: 50px; font-size: 16px; cursor: pointer; }
+        .stage.ready .panda { transform: translateX(0); }
+        .stage.open .panda { transform: scale(0.4) translateY(220px); }
+        .stage.open .letter { transform: scale(1) translateY(-30px); opacity: 1; }
+        .leaf { position: absolute; pointer-events: none; animation: leafFall 4s linear forwards; }
+        @keyframes leafFall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop preload="auto">
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="stage" id="stage">
+        <button class="start-btn" id="startBtn" onclick="startSecurity()">Panggil Panda 🐼</button>
+        
+        <div id="securityScreen">
+            <h2>VERIFIKASI PANDA 🛡️</h2>
+            <p>Klik hidung <b>5 kali</b> untuk musik & pesan.</p>
+            <div class="nose-btn" onclick="checkNose()"></div>
+            <p id="clickCount">Klik: 0/5</p>
+        </div>
+
+        <div class="panda" id="pandaBody" onclick="openLetter()">
+            <div class="ear l"></div> <div class="ear r"></div>
+            <div class="eye-patch l"></div> <div class="eye-patch r"></div>
+            <div class="nose"></div>
+        </div>
+
+        <div class="letter" id="letterBox">
+            <div class="page active" id="page1">
+                <h2 style="font-family: 'Pacifico'; color: var(--dark-leaf);">Akses Diterima!</h2>
+                <p>Hai, seseorang nitipin pesan rahasia... <br><br> Makasih ya sudah hadir. Dunianya jadi seru sejak ada kamu. <br><br> <b>F: J!</b></p>
+                <p style="font-size: 11px;">(Klik panda untuk tutup)</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const music = document.getElementById('bgMusic');
+        let count = 0;
+
+        function startSecurity() { 
+            document.getElementById('startBtn').style.display = 'none'; 
+            document.getElementById('securityScreen').style.display = 'flex';
+            // Trik: Mainkan lalu pause untuk 'pancing' izin browser
+            music.play().then(() => { music.pause(); }).catch(e => {}); 
+        }
+
+        function checkNose() {
+            count++; 
+            document.getElementById('clickCount').innerHTML = "Klik: " + count + "/5";
+            if(count >= 5) {
+                // Paksa Putar
+                music.muted = false;
+                music.play();
+                document.getElementById('securityScreen').style.display = 'none';
+                document.getElementById('stage').classList.add('ready');
+            }
+        }
+
+        function openLetter() {
+            music.play(); // Double check musik saat panda diklik
+            document.getElementById('stage').classList.toggle('open');
+            if(document.getElementById('stage').classList.contains('open')) createLeafShower();
+        }
+
+        function createLeafShower() { 
+            for(let i=0; i<10; i++) {
+                setTimeout(() => {
+                    const leaf = document.createElement('div');
+                    leaf.className = 'leaf';
+                    leaf.innerHTML = '🌸';
+                    leaf.style.left = Math.random() * 100 + 'vw';
+                    document.body.appendChild(leaf);
+                    setTimeout(() => leaf.remove(), 4000);
+                }, i * 150);
+            }
+        }
+    </script>
+</body>
+</html>
